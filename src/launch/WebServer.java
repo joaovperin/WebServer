@@ -31,11 +31,12 @@ public class WebServer {
         if (webPort == null || webPort.isEmpty()) {
             webPort = "8080";
         }
+        System.out.println("Porta: " + webPort);
         // Instancia o Tomcat e define a porta
         Tomcat tomcat = new Tomcat();
         tomcat.setPort(Integer.valueOf(webPort));
         // Determina o diretório WebApp
-        String webappDirLocation = "res/";
+        String webappDirLocation = "WEB-APP/";
         StandardContext ctx = (StandardContext) tomcat.addWebapp("/", new File(webappDirLocation).getAbsolutePath());
         System.out.println("Configurando com diretório base: " + new File("./" + webappDirLocation).getAbsolutePath());
         // Declare a localização alternativa do diretório de classes ("WEB-INF/classes")
