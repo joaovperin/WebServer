@@ -5,10 +5,13 @@
  */
 package servlet;
 
-import java.io.BufferedReader;
+import core.Processor;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,11 +29,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "AppServlet", urlPatterns = {"/app"})
 public class AppServlet extends HttpServlet {
-
-    /**
-     * Tamanho padrão do buffer (em bytes)
-     */
-    private static final int TAM_BUFFER_PADRAO = 8192;
 
     /**
      * Responde a requisições GET
@@ -57,30 +55,40 @@ public class AppServlet extends HttpServlet {
      * @param req Request recebido pelo Servlet
      * @return String
      */
-    private String buscaHtmls(HttpServletRequest req) throws ServletException, ServletException {
-        StringBuilder sb = new StringBuilder(TAM_BUFFER_PADRAO);
+    private String buscaHtmls(HttpServletRequest req) throws ServletException {
+        String page = "notFound";
+        // Busca a página nos atributos do request
+        Map<String, String[]> parameterMap = Collections.synchronizedMap(req.getParameterMap());
 
-        String page = req.getParameter("page");
-        if (page == null) {
-            page = "erro";
+        String[] pageParam = parameterMap.get("page");
+        if (pageParam != null && pageParam.length == 1) {
+            page = pageParam[0];
         }
-
-        page = page.concat(".html");
-        InputStream resources = req.getServletContext().getResourceAsStream(page);
-
-        String l;
-        // Realiza a leitura bufferizada
-        try (BufferedReader bf = new BufferedReader(new InputStreamReader(resources))) {
-            while ((l = bf.readLine()) != null) {
-                sb.append(l);
+        // Converte o mapa e põe no novo Map
+        Map model = new HashMap<>();
+        req.getParameterMap().forEach((k, v) -> {
+            if (v.length == 1) {
+                model.put(k, v[0]);
+            } else {
+                model.put(k, v);
             }
-        } catch (IOException e) {
-            e.printStackTrace(System.out);
-            sb.append("Falha ap abrir arquivo!").append('\n');
-            sb.append(e);
+        });
+        // Busca a página, o template, realiza o processamento e devolve ao cliente
+        String xxx = page.concat(".ftl");
+        try {
+            InputStream res = getS(req, xxx);
+            if (res == null) {
+                throw new FileNotFoundException(xxx);
+            }
+            return new Processor().read(xxx, res, model);
+        } catch (FileNotFoundException ex) {
+            String fileNoutFohund = "fileNotFound.ftl";
+            return new Processor().readFileNotFound(fileNoutFohund, getS(req, fileNoutFohund), model);
         }
-
-        return sb.toString();
-
     }
+
+    private InputStream getS(HttpServletRequest req, String xxx) {
+        return req.getServletContext().getResourceAsStream(xxx);
+    }
+
 }
