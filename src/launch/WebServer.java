@@ -12,6 +12,9 @@ package launch;
  */
 public class WebServer {
 
+    /** Diretório base */
+    private static final String DIR_BASE = "";
+
     /**
      * EntryPoint principal
      *
@@ -20,10 +23,11 @@ public class WebServer {
      */
     public static void main(String[] args) throws Exception {
         // Pega a porta da variável de ambiente assumindo default 8082.
-        String webPort = System.getenv("PORT");
+        String webPort = System.getenv("WebServer.PORT");
         if (webPort == null || webPort.isEmpty()) {
             webPort = "8082";
         }
+        System.out.println("Porta: " + webPort);
         // Instancia e roda o server
         Server sv = new SimpleServer(Integer.valueOf(webPort));
         sv.start();

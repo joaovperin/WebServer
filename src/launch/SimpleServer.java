@@ -53,7 +53,6 @@ public class SimpleServer implements Server {
 //        tomcat.setBaseDir(webappDirLocation);
     }
 
-
     @Override
     @SuppressWarnings("UseSpecificCatch")
     public void start() {
@@ -63,7 +62,6 @@ public class SimpleServer implements Server {
             // Determina o diretório WebApp
             StandardContext ctx = (StandardContext) tomcat.addWebapp("/", new File(WEB_APP_DIR_LOCATION).
                     getAbsolutePath());
-
 //            ctx.addApplicationListener(org.jboss.weld.environment.servlet.Listener.class.getName());
 //            ctx.addParameter("javax.servlet.jsp.jstl.fmt.locale", "pt_BR");
 //            addFilter(ctx, VRaptor.class, "/*", DispatcherType.REQUEST, DispatcherType.FORWARD);
@@ -97,7 +95,7 @@ public class SimpleServer implements Server {
     @Override
     public void await() {
         // Inicia o servidor e escuta a porta
-        System.out.println("Servidor rodando na Porta " + tomcat.getServer().getPort() + ".f");
+        System.out.println("Servidor iniciando!");
         tomcat.getServer().await();
     }
 
